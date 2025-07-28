@@ -56,17 +56,19 @@ exports.toggleLike = async (req, res) => {
     const tweet = await Tweet.findById(req.params.id);
     if (!tweet) return res.status(404).json({ msg: 'Tweet not found' });
 
-    const liked = tweet.likes.includes(req.userId);
-    if (liked) {
-      tweet.likes.pull(req.userId);
-        tweet.likesCount = Math.max(0, tweet.likesCount - 1);
+    const userId = req.userId;
+    const alreadyLiked = tweet.likes.includes(userId);
+
+    if (alreadyLiked) {
+      tweet.likes.pull(userId);
     } else {
-      tweet.likes.push(req.userId);
-        tweet.likesCount += 1;
+      tweet.likes.push(userId);
     }
 
+    tweet.likesCount = tweet.likes.length;
     await tweet.save();
-    res.json({ liked: !liked, likesCount: tweet.likes.length });
+
+    res.json({ msg: alreadyLiked ? 'Unliked' : 'Liked' });
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
