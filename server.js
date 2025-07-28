@@ -13,5 +13,6 @@ app.use(express.json());
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/tweets', require('./routes/tweets'));
 app.use('/api/users', require('./routes/users'));
+app.use('/api', require('./routes/feed'));
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
