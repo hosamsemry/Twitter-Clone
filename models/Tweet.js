@@ -6,6 +6,7 @@ const tweetSchema = new mongoose.Schema({
   media: { type: String },
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   likesCount: { type: Number, default: 0 },
+  replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tweet' }],
   retweetOf: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Tweet',
