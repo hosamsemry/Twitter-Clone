@@ -31,6 +31,11 @@ exports.getTweetById = async (req, res) => {
     const tweet = await Tweet.findById(req.params.id)
   .populate('author', 'username avatar')
   .populate({
+    path: 'replies',
+    populate: { path: 'author', select: 'username avatar' },
+    options: { sort: { createdAt: -1 } }
+  })
+  .populate({
     path: 'retweetOf',
     populate: { path: 'author', select: 'username avatar' }
   });
