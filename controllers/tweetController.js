@@ -29,7 +29,12 @@ exports.getAllTweets = async (req, res) => {
 exports.getTweetById = async (req, res) => {
   try {
     const tweet = await Tweet.findById(req.params.id)
-      .populate('author', 'username avatar');
+  .populate('author', 'username avatar')
+  .populate({
+    path: 'retweetOf',
+    populate: { path: 'author', select: 'username avatar' }
+  });
+
     if (!tweet) return res.status(404).json({ msg: 'Tweet not found' });
     res.json(tweet);
   } catch (err) {
@@ -73,3 +78,46 @@ exports.toggleLike = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
+
+
+exports.toggleRetweet = async (req, res) => {
+  try {
+    let originalTweet = await Tweet.findById(req.params.id);
+    if (!originalTweet) return res.status(404).json({ msg: 'Tweet not found' });
+
+    if (originalTweet.retweetOf) {
+      originalTweet = await Tweet.findById(originalTweet.retweetOf);
+      if (!originalTweet) return res.status(404).json({ msg: 'Original tweet not found' });
+    }
+
+    const existingRetweet = await Tweet.findOne({
+      author: req.userId,
+      retweetOf: originalTweet._id
+    });
+
+    if (existingRetweet) {
+      await existingRetweet.deleteOne();
+      return res.json({ msg: 'Retweet removed.' });
+    }
+
+    const retweet = new Tweet({
+      author: req.userId,
+      retweetOf: originalTweet._id
+    });
+
+    await retweet.save();
+
+    await retweet.populate({
+    path: 'retweetOf',
+    populate: {
+      path: 'author',
+      select: 'username avatar'
+    }
+  })
+
+    res.status(201).json(retweet);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
+
