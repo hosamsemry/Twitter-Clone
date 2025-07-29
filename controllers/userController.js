@@ -1,5 +1,5 @@
 const User = require("../models/User");
-
+const Tweet = require("../models/Tweet");
 exports.toggleFollow = async (req, res) => {
   try {
     const targetUserId = req.params.id;
@@ -97,16 +97,28 @@ exports.deleteUser = async (req, res) => {
 
 exports.getCurrentUserProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.userId).select("-password");
-    if (!user) return res.status(404).json({ msg: "User not found." });
+    const user = await User.findById(req.userId).select('-password');
+    if (!user) return res.status(404).json({ msg: 'User not found.' });
 
     const followersCount = user.followers.length;
     const followingCount = user.following.length;
+
+    const tweets = await Tweet.find({ author: req.userId })
+      .sort({ createdAt: -1 })
+      .populate({
+        path: 'retweetOf',
+        populate: {
+          path: 'author',
+          select: 'username avatar'
+        }
+      })
+      .populate('author', 'username profilePicture');
 
     res.json({
       ...user.toObject(),
       followersCount,
       followingCount,
+      tweets
     });
   } catch (err) {
     res.status(500).json({ msg: err.message });
