@@ -5,7 +5,8 @@ const {
   getAllTweets,
   getTweetById,
   deleteTweet,
-  toggleLike
+  toggleLike,
+  toggleRetweet
 } = require('../controllers/tweetController');
 
 router.post('/', auth, createTweet);
@@ -13,5 +14,6 @@ router.get('/', getAllTweets);
 router.get('/:id', getTweetById);
 router.delete('/:id', auth, deleteTweet);
 router.post('/:id/like', auth, toggleLike);
+router.post('/:id/retweet', auth, toggleRetweet);
 
 module.exports = router;
