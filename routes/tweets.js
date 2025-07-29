@@ -7,7 +7,8 @@ const {
   deleteTweet,
   toggleLike,
   toggleRetweet,
-  quotetweet
+  quotetweet,
+  replyToTweet
 } = require('../controllers/tweetController');
 
 router.post('/', auth, createTweet);
@@ -17,5 +18,6 @@ router.delete('/:id', auth, deleteTweet);
 router.post('/:id/like', auth, toggleLike);
 router.post('/:id/retweet', auth, toggleRetweet);
 router.post('/:id/quote', auth, quotetweet);
+router.post('/:id/reply', auth, replyToTweet);
 
 module.exports = router;
