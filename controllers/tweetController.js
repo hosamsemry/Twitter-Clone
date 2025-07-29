@@ -121,3 +121,25 @@ exports.toggleRetweet = async (req, res) => {
   }
 };
 
+exports.quotetweet = async (req, res) => {
+  try {
+    const originalTweet = await Tweet.findById(req.params.id);
+    if (!originalTweet) return res.status(404).json({ msg: 'Original tweet not found.' });
+
+    const { content } = req.body;
+    if (!content || content.trim() === '') {
+      return res.status(400).json({ msg: 'Quote content is required.' });
+    }
+
+    const quote = new Tweet({
+      author: req.userId,
+      content,
+      retweetOf: originalTweet._id
+    });
+
+    await quote.save();
+    res.status(201).json({ msg: 'Quote retweet posted.', quote });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
