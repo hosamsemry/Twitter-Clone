@@ -143,3 +143,29 @@ exports.quotetweet = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
+
+exports.replyToTweet = async (req, res) => {
+  try {
+    const originalTweet = await Tweet.findById(req.params.id);
+    if (!originalTweet) return res.status(404).json({ msg: 'Original tweet not found.' });
+
+    const { content } = req.body;
+    if (!content || content.trim() === '') {
+      return res.status(400).json({ msg: 'Reply content is required.' });
+    }
+
+    const reply = new Tweet({
+      author: req.userId,
+      content,
+      retweetOf: originalTweet._id,
+      replies: []
+    }); 
+    await reply.save();
+    originalTweet.replies.push(reply._id);
+    await originalTweet.save();
+    await reply.populate('author', 'username avatar');
+    res.status(201).json({ msg: 'Reply posted.', reply });
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
