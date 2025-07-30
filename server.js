@@ -15,5 +15,6 @@ app.use('/api/tweets', require('./routes/tweets'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api', require('./routes/feed'));
 app.use('/api', require('./routes/search'))
+app.use('/api', require('./routes/trending'))
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
