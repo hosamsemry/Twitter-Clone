@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const Tweet = require("../models/Tweet");
+const Notification = require('../models/Notification')
 exports.toggleFollow = async (req, res) => {
   try {
     const targetUserId = req.params.id;
@@ -25,6 +26,14 @@ exports.toggleFollow = async (req, res) => {
 
     await currentUser.save();
     await targetUser.save();
+
+    await Notification.create({
+      type: 'follow',
+      sender: req.userId,
+      receiver: tweet.author,
+      tweet: tweet._id
+    });
+
 
     res.json({
       following: !isFollowing,
