@@ -17,5 +17,6 @@ app.use('/api', require('./routes/feed'));
 app.use('/api', require('./routes/search'))
 app.use('/api', require('./routes/trending'))
 app.use('/api', require('./routes/notifications'))
+app.use('/api', require('./routes/bookmarks'))
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
