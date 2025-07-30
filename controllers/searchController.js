@@ -7,14 +7,22 @@ exports.searchAll = async (req, res)=>{
         return res.status(400).json({msg: "Query is required"})
     }
     try {
-        const regex = new RegExp(query, 'i');
-        const users = await User.find({ username: regex }).select('username avatar bio');
-        const tweets = await Tweet.find({ content: regex })
-        .populate('author', 'username avatar bio')
-        .sort({ createdAt: -1 });
-        res.json({users, tweets})
-    } catch (err) {
-        res.status(500).json({msg:err.msg})
-    }
+    const users = await User.find(
+      { $text: { $search: query } },
+    )
+      .sort({ score: { $meta: "textScore" } })
+      .select("username avatar bio");
+
+    const tweets = await Tweet.find(
+      { $text: { $search: query } },
+    )
+      .sort({ score: { $meta: "textScore" } })
+      .populate("author", "username avatar bio");
+
+    return res.json({ users, tweets });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Search failed" });
+  }
 }
 
