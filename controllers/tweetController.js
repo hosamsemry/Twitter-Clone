@@ -1,12 +1,17 @@
 const Tweet = require('../models/Tweet');
-
+const extractHashtags = require('../utils/extractHashtags')
 
 exports.createTweet = async (req, res) => {
   try {
+
+    const { content, media } = req.body;
+    const hashtags = extractHashtags(content);
+
     const tweet = await Tweet.create({
       author: req.userId,
-      content: req.body.content,
-      media: req.body.media
+      content,
+      media,
+      hashtags
     });
     res.status(201).json(tweet);
   } catch (err) {
@@ -131,7 +136,8 @@ exports.quotetweet = async (req, res) => {
     const originalTweet = await Tweet.findById(req.params.id);
     if (!originalTweet) return res.status(404).json({ msg: 'Original tweet not found.' });
 
-    const { content } = req.body;
+    const content = req.body;
+    const hashtags = extractHashtags(content);
     if (!content || content.trim() === '') {
       return res.status(400).json({ msg: 'Quote content is required.' });
     }
@@ -139,6 +145,7 @@ exports.quotetweet = async (req, res) => {
     const quote = new Tweet({
       author: req.userId,
       content,
+      hashtags,
       retweetOf: originalTweet._id
     });
 
@@ -154,7 +161,8 @@ exports.replyToTweet = async (req, res) => {
     const originalTweet = await Tweet.findById(req.params.id);
     if (!originalTweet) return res.status(404).json({ msg: 'Original tweet not found.' });
 
-    const { content } = req.body;
+    const { content, media } = req.body;
+    const hashtags = extractHashtags(content);
     if (!content || content.trim() === '') {
       return res.status(400).json({ msg: 'Reply content is required.' });
     }
@@ -162,6 +170,8 @@ exports.replyToTweet = async (req, res) => {
     const reply = new Tweet({
       author: req.userId,
       content,
+      media,
+      hashtags,
       retweetOf: originalTweet._id,
       replies: []
     }); 
