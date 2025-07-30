@@ -1,5 +1,6 @@
 const Tweet = require('../models/Tweet');
 const extractHashtags = require('../utils/extractHashtags')
+const Notification = require('../models/Notification')
 
 exports.createTweet = async (req, res) => {
   try {
@@ -78,6 +79,12 @@ exports.toggleLike = async (req, res) => {
       tweet.likes.pull(userId);
     } else {
       tweet.likes.push(userId);
+      await Notification.create({
+          type: 'like',
+          sender: req.userId,
+          receiver: tweet.author,
+          tweet: tweet._id
+        });
     }
 
     tweet.likesCount = tweet.likes.length;
@@ -125,6 +132,13 @@ exports.toggleRetweet = async (req, res) => {
     }
   })
 
+  await Notification.create({
+          type: 'retweet',
+          sender: req.userId,
+          receiver: tweet.author,
+          tweet: tweet._id
+        });
+
     res.status(201).json(retweet);
   } catch (err) {
     res.status(500).json({ msg: err.message });
@@ -150,6 +164,12 @@ exports.quotetweet = async (req, res) => {
     });
 
     await quote.save();
+    await Notification.create({
+          type: 'quote',
+          sender: req.userId,
+          receiver: tweet.author,
+          tweet: tweet._id
+        });
     res.status(201).json({ msg: 'Quote retweet posted.', quote });
   } catch (err) {
     res.status(500).json({ msg: err.message });
@@ -180,6 +200,13 @@ exports.replyToTweet = async (req, res) => {
     await originalTweet.save();
     await reply.populate('author', 'username avatar');
     res.status(201).json({ msg: 'Reply posted.', reply });
+
+    await Notification.create({
+          type: 'reply',
+          sender: req.userId,
+          receiver: originalTweet.author,
+          tweet: originalTweet._id
+        });
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }
