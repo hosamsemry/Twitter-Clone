@@ -4,6 +4,7 @@ const tweetSchema = new mongoose.Schema({
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   content: {type: String,  maxlength: 280,  required: function () {return !this.retweetOf;}},
   media: { type: String },
+  hashtags: [{ type: String }],
   likes: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
   likesCount: { type: Number, default: 0 },
   replies: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Tweet' }],
