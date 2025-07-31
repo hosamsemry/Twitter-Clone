@@ -44,7 +44,8 @@ exports.getTweetById = async (req, res) => {
   .populate({
     path: 'retweetOf',
     populate: { path: 'author', select: 'username avatar' }
-  });
+  })
+  .populate('bookmarkCount');
 
     if (!tweet) return res.status(404).json({ msg: 'Tweet not found' });
     res.json(tweet);
