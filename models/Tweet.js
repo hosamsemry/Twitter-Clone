@@ -15,4 +15,14 @@ const tweetSchema = new mongoose.Schema({
   },
 }, { timestamps: true });
 
+tweetSchema.virtual('bookmarkCount', {
+  ref: 'User',
+  localField: '_id',
+  foreignField: 'bookmarks',
+  count: true
+});
+
+tweetSchema.set('toObject', { virtuals: true });
+tweetSchema.set('toJSON', { virtuals: true });
+
 module.exports = mongoose.model('Tweet', tweetSchema);
