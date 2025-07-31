@@ -15,7 +15,6 @@ exports.trendingHashtags = async (req, res) => {
 
     res.json(trends);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to fetch trends" });
   }
 };
@@ -30,7 +29,6 @@ exports.getTweetsByHashtag = async (req, res) => {
 
     res.json(tweets);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Failed to fetch tweets for hashtag" });
   }
 };

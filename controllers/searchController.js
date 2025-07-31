@@ -21,7 +21,6 @@ exports.searchAll = async (req, res)=>{
 
     return res.json({ users, tweets });
   } catch (err) {
-    console.error(err);
     res.status(500).json({ error: "Search failed" });
   }
 }

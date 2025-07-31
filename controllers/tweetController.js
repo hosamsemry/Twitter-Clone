@@ -26,7 +26,6 @@ exports.getAllTweets = async (req, res) => {
       .sort({ createdAt: -1 })
       .populate('author', 'username avatar', '');
     res.json(tweets);
-    console.log(tweets)
   } catch (err) {
     res.status(500).json({ msg: err.message });
   }

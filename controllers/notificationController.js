@@ -9,7 +9,6 @@ exports.getNotifications = async (req, res) => {
 
     res.json(notifications);
   } catch (err) {
-    console.error(err);
     res.status(500).json({ msg: 'Failed to fetch notifications' });
   }
 };
