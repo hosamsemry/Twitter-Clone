@@ -14,7 +14,7 @@ exports.searchAll = async (req, res)=>{
       .select("username avatar bio");
 
     const tweets = await Tweet.find(
-      { $text: { $search: query } },
+      { $text: { $search: query }, isDeleted:false },
     )
       .sort({ score: { $meta: "textScore" } })
       .populate("author", "username avatar bio");

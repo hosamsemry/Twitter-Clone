@@ -8,7 +8,7 @@ exports.getUserFeed = async (req, res) => {
 
     const following = [...user.following, user._id]; 
 
-    const tweets = await Tweet.find({ author: { $in: following } })
+    const tweets = await Tweet.find({ author: { $in: following },isDeleted:false })
       .sort({ createdAt: -1 })
       .select('content likes likesCount createdAt author') 
       .populate('author', 'username profilePicture') 

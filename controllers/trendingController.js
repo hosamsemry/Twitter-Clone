@@ -6,7 +6,7 @@ exports.trendingHashtags = async (req, res) => {
     oneDayAgo.setDate(oneDayAgo.getDate() - 1);
 
     const trends = await Tweet.aggregate([
-      { $match: { createdAt: { $gte: oneDayAgo } } },
+      { $match: { createdAt: { $gte: oneDayAgo } },isDeleted: false },
       { $unwind: "$hashtags" },
       { $group: { _id: "$hashtags", count: { $sum: 1 } } },
       { $sort: { count: -1 } },
@@ -23,7 +23,7 @@ exports.getTweetsByHashtag = async (req, res) => {
   try {
     const tag = req.params.tag;
     
-    const tweets = await Tweet.find({ hashtags: { $regex: tag, $options: 'i' } })
+    const tweets = await Tweet.find({ hashtags: { $regex: tag, $options: 'i' }, isDeleted:false })
       .populate('author', 'username avatar bio')
       .sort({ createdAt: -1 });
 
