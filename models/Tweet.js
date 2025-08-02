@@ -13,6 +13,7 @@ const tweetSchema = new mongoose.Schema({
     ref: 'Tweet',
     default: null,
   },
+  isDeleted: { type: Boolean, default: false },
 }, { timestamps: true });
 
 tweetSchema.virtual('bookmarkCount', {
