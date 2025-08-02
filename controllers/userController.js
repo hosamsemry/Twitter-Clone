@@ -96,9 +96,12 @@ exports.updateUser = async (req, res) => {
 
 exports.deleteUser = async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.params.id);
+    const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ msg: "User not found." });
-    res.json({ msg: "User deleted successfully." });
+    
+    user.isDeleted = true;
+    user.save()
+    res.json({ msg: 'User account soft-deleted' });
   } catch (err) {
     res.status(400).json({ msg: "Invalid ID or data." });
   }
