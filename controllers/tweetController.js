@@ -22,7 +22,7 @@ exports.createTweet = async (req, res) => {
 
 exports.getAllTweets = async (req, res) => {
   try {
-    const tweets = await Tweet.find()
+    const tweets = await Tweet.find({ isDeleted: false })
       .sort({ createdAt: -1 })
       .populate('author', 'username avatar', '');
     res.json(tweets);
@@ -33,10 +33,11 @@ exports.getAllTweets = async (req, res) => {
 
 exports.getTweetById = async (req, res) => {
   try {
-    const tweet = await Tweet.findById(req.params.id)
+    const tweet = await Tweet.findOne({_id:req.params.id, isDeleted:false})
   .populate('author', 'username avatar')
   .populate({
     path: 'replies',
+    match: { isDeleted: false },
     populate: { path: 'author', select: 'username avatar' },
     options: { sort: { createdAt: -1 } }
   })
@@ -60,7 +61,8 @@ exports.deleteTweet = async (req, res) => {
     if (tweet.author.toString() !== req.userId)
       return res.status(403).json({ msg: 'Not authorized' });
 
-    await tweet.deleteOne();
+    tweet.isDeleted = true;
+    await tweet.save()
     res.json({ msg: 'Tweet deleted' });
   } catch (err) {
     res.status(500).json({ msg: err.message });
