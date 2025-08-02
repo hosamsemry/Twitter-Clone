@@ -213,3 +213,39 @@ exports.replyToTweet = async (req, res) => {
     res.status(500).json({ msg: err.message });
   }
 };
+
+////////////////////////////////////////
+
+exports.getDeletedTweets = async (req, res) => {
+  try {
+    const tweets = await Tweet.find({ isDeleted: true })
+      .sort({ createdAt: -1 })
+      .populate('author', 'username avatar', '');
+    res.json(tweets);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
+
+exports.getDeletedTweetById = async (req, res) => {
+  try {
+    const tweet = await Tweet.findOne({_id:req.params.id, isDeleted:true})
+  .populate('author', 'username avatar')
+  .populate({
+    path: 'replies',
+    match: { isDeleted: false },
+    populate: { path: 'author', select: 'username avatar' },
+    options: { sort: { createdAt: -1 } }
+  })
+  .populate({
+    path: 'retweetOf',
+    populate: { path: 'author', select: 'username avatar' }
+  })
+  .populate('bookmarkCount');
+
+    if (!tweet) return res.status(404).json({ msg: 'Tweet not found' });
+    res.json(tweet);
+  } catch (err) {
+    res.status(500).json({ msg: err.message });
+  }
+};
