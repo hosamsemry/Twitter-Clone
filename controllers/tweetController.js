@@ -137,8 +137,8 @@ exports.toggleRetweet = async (req, res) => {
   await Notification.create({
           type: 'retweet',
           sender: req.userId,
-          receiver: tweet.author,
-          tweet: tweet._id
+          receiver: originalTweet.author,
+          tweet: originalTweet._id
         });
 
     res.status(201).json(retweet);
@@ -152,7 +152,7 @@ exports.quotetweet = async (req, res) => {
     const originalTweet = await Tweet.findById(req.params.id);
     if (!originalTweet) return res.status(404).json({ msg: 'Original tweet not found.' });
 
-    const content = req.body;
+    const { content, media } = req.body;
     const hashtags = extractHashtags(content);
     if (!content || content.trim() === '') {
       return res.status(400).json({ msg: 'Quote content is required.' });
@@ -169,8 +169,8 @@ exports.quotetweet = async (req, res) => {
     await Notification.create({
           type: 'quote',
           sender: req.userId,
-          receiver: tweet.author,
-          tweet: tweet._id
+          receiver: originalTweet.author,
+          tweet: originalTweet._id
         });
     res.status(201).json({ msg: 'Quote retweet posted.', quote });
   } catch (err) {
